@@ -30,12 +30,9 @@ jobs:
       run: |
         go get .
 
-    - name: Set binary name
-      run: echo "BIN_NAME=NomadState${{ matrix.os == 'windows-latest' && '.exe' || '' }}" >> $GITHUB_ENV
-
     - name: Set build name with tag
       shell: bash
-      run: echo "BUILD_NAME=NomadState-${GITHUB_REF_NAME}-${{ matrix.os == 'windows-latest' && 'windows-amd64.exe' || 'linux-amd64' }} " >> $GITHUB_ENV
+      run: echo "BUILD_NAME=nomadstate-${GITHUB_REF_NAME}-${{ matrix.os == 'windows-latest' && 'windows-amd64.exe' || 'linux-amd64' }} " >> $GITHUB_ENV
 
     - name: Build
       run: go build -o ${{ env.BUILD_NAME }}
@@ -44,6 +41,6 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          NomadState*
+          nomadstate*
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
