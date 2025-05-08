@@ -1,4 +1,4 @@
-name: Release linux binary
+name: Release binaries
 
 on:
   push:
@@ -6,9 +6,12 @@ on:
       - "v*"
 
 jobs:
-
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest"]
+
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
 
@@ -26,13 +29,20 @@ jobs:
       run: |
         go get .
 
+    - name: Set binary name
+      run: echo "BIN_NAME=NomadState${{ matrix.os == 'windows-latest' && '.exe' || '' }}" >> $GITHUB_ENV
+
+    - name: Set build name with tag
+      shell: bash
+      run: echo "BUILD_NAME=NomadState-${GITHUB_REF_NAME}-${{ matrix.os == 'windows-latest' && 'windows-amd64.exe' || 'linux-amd64' }} " >> $GITHUB_ENV
+
     - name: Build
-      run: go build -o NomadState
+      run: go build -o ${{ env.BUILD_NAME }}
 
     - name: Upload Release Assets
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          *
+          NomadState*
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
