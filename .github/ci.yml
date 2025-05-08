@@ -1,0 +1,38 @@
+name: Release linux binary
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get version
+      run: |
+        version=$(echo ${GITHUB_REF_NAME} | sed -e 's/^v//')
+        echo "BUILD_VER=$version" >> $GITHUB_ENV
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Install dependencies
+      run: |
+        go get .
+
+    - name: Build
+      run: go build -o NomadState
+
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          *
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
