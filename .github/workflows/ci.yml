@@ -16,6 +16,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Get version
+      shell: bash
       run: |
         version=$(echo ${GITHUB_REF_NAME} | sed -e 's/^v//')
         echo "BUILD_VER=$version" >> $GITHUB_ENV
